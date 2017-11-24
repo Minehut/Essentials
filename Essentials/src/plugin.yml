@@ -387,10 +387,6 @@ commands:
     description: Change your speed limits.
     usage: /<command> [type] <speed> [player]
     aliases: [flyspeed,eflyspeed,fspeed,efspeed,espeed,walkspeed,ewalkspeed,wspeed,ewspeed]
-  sudo:
-    description: Make another user perform a command.
-    usage: /<command> <player> <command [args]>
-    aliases: [esudo]
   suicide:
     description: Causes you to perish.
     usage: /<command>

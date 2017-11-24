@@ -607,7 +607,7 @@ public abstract class UserData extends PlayerExtension implements IConf {
     private String lastLoginAddress;
 
     private String _getLastLoginAddress() {
-        return config.getString("ipAddress", "");
+        return "N/A";
     }
 
     public String getLastLoginAddress() {
@@ -639,7 +639,7 @@ public abstract class UserData extends PlayerExtension implements IConf {
     private String geolocation;
 
     private String _getGeoLocation() {
-        return config.getString("geolocation");
+        return "N/A";
     }
 
     public String getGeoLocation() {
