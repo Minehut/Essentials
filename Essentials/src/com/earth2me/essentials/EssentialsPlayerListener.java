@@ -443,30 +443,31 @@ public class EssentialsPlayerListener implements Listener {
 
         PluginCommand pluginCommand = ess.getServer().getPluginCommand(cmd);
 
-        if (!socialSpyBlocked.contains(cmd) && (ess.getSettings().getSocialSpyCommands().contains(cmd) || ess.getSettings().getSocialSpyCommands().contains("*"))) {
-            if (pluginCommand == null
-                    || (!pluginCommand.getName().equals("msg") && !pluginCommand.getName().equals("r"))) { // /msg and /r are handled in SimpleMessageRecipient
-                User user = ess.getUser(player);
-                if (!user.isAuthorized("essentials.chat.spy.exempt")) {
-                    for (User spyer : ess.getOnlineUsers()) {
-                        if (spyer.isSocialSpyEnabled() && !player.equals(spyer.getBase())) {
-                            if (user.isMuted() && ess.getSettings().getSocialSpyListenMutedPlayers()) {
-                                spyer.sendMessage(tl("socialSpyMutedPrefix") + player.getDisplayName() + ": " + event.getMessage());
-                            }
-                            else {
-                                spyer.sendMessage(tl("socialSpyPrefix") + player.getDisplayName() + ": " + event.getMessage());
+        if (!socialSpyBlocked.contains(cmd)) {
+            if (ess.getSettings().getSocialSpyCommands().contains(cmd) || ess.getSettings().getSocialSpyCommands().contains("*")) {
+                if (pluginCommand == null
+                        || (!pluginCommand.getName().equals("msg") && !pluginCommand.getName().equals("r"))) { // /msg and /r are handled in SimpleMessageRecipient
+                    User user = ess.getUser(player);
+                    if (!user.isAuthorized("essentials.chat.spy.exempt")) {
+                        for (User spyer : ess.getOnlineUsers()) {
+                            if (spyer.isSocialSpyEnabled() && !player.equals(spyer.getBase())) {
+                                if (user.isMuted() && ess.getSettings().getSocialSpyListenMutedPlayers()) {
+                                    spyer.sendMessage(tl("socialSpyMutedPrefix") + player.getDisplayName() + ": " + event.getMessage());
+                                } else {
+                                    spyer.sendMessage(tl("socialSpyPrefix") + player.getDisplayName() + ": " + event.getMessage());
+                                }
                             }
                         }
                     }
                 }
             }
-        }
 
-        if (ess.getUser(player).isMuted() && (ess.getSettings().getMuteCommands().contains(cmd) || ess.getSettings().getMuteCommands().contains("*"))) {
-            event.setCancelled(true);
-            player.sendMessage(tl("voiceSilenced"));
-            LOGGER.info(tl("mutedUserSpeaks", player.getName(), event.getMessage()));
-            return;
+            if (ess.getUser(player).isMuted() && (ess.getSettings().getMuteCommands().contains(cmd) || ess.getSettings().getMuteCommands().contains("*"))) {
+                event.setCancelled(true);
+                player.sendMessage(tl("voiceSilenced"));
+                LOGGER.info(tl("mutedUserSpeaks", player.getName(), event.getMessage()));
+                return;
+            }
         }
         
         boolean broadcast = true; // whether to broadcast the updated activity
