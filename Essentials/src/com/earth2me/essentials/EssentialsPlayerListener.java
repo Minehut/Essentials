@@ -34,11 +34,7 @@ import org.bukkit.inventory.PlayerInventory;
 
 import java.io.IOException;
 import java.text.NumberFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -438,6 +434,8 @@ public class EssentialsPlayerListener implements Listener {
         }
     }
 
+    private static final List<String> socialSpyBlocked = Arrays.asList("msg", "m", "tell", "message", "reply", "r", "find", "ignore", "settings");
+
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerCommandPreprocess(final PlayerCommandPreprocessEvent event) {
         final Player player = event.getPlayer();
@@ -445,7 +443,7 @@ public class EssentialsPlayerListener implements Listener {
 
         PluginCommand pluginCommand = ess.getServer().getPluginCommand(cmd);
 
-        if (ess.getSettings().getSocialSpyCommands().contains(cmd) || ess.getSettings().getSocialSpyCommands().contains("*")) {
+        if (!socialSpyBlocked.contains(cmd) && (ess.getSettings().getSocialSpyCommands().contains(cmd) || ess.getSettings().getSocialSpyCommands().contains("*"))) {
             if (pluginCommand == null
                     || (!pluginCommand.getName().equals("msg") && !pluginCommand.getName().equals("r"))) { // /msg and /r are handled in SimpleMessageRecipient
                 User user = ess.getUser(player);
