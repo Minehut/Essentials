@@ -7,6 +7,9 @@ import com.earth2me.essentials.utils.FormatUtil;
 import com.earth2me.essentials.utils.NumberUtil;
 import com.google.common.base.Joiner;
 import net.ess3.api.IEssentials;
+import net.ess3.nms.refl.ReflUtil;
+
+import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.FireworkEffect;
@@ -117,6 +120,26 @@ public class MetaItemStack {
     }
 
     public void parseStringMeta(final CommandSource sender, final boolean allowUnsafe, String[] string, int fromArg, final IEssentials ess) throws Exception {
+        // Make any entries after lore definition become the lore and not parsed.
+        {
+            int loreIndex = -1;
+            boolean dirty = false;
+            for (int i = 0; i < string.length; i++) {
+                String _str = string[i];
+                if (loreIndex == -1) {
+                    if (_str.matches("^lore" + splitPattern.pattern() + ".*")) {
+                        loreIndex = i;
+                    }
+                } else {
+                    string[loreIndex] += " " + string[i];
+                    string[i] = null;
+                    dirty = true;
+                }
+            }
+            if (dirty) {
+                string = (String[]) ArrayUtils.subarray(string, 0, loreIndex + 1);
+            }
+        }
         if (string[fromArg].startsWith("{") && hasMetaPermission(sender, "vanilla", false, true, ess)) {
             try {
                 stack = ess.getServer().getUnsafe().modifyItemStack(stack, Joiner.on(' ').join(Arrays.asList(string).subList(fromArg, string.length)));
@@ -370,9 +393,17 @@ public class MetaItemStack {
                 }
                 pmeta.addCustomEffect(pEffect, true);
                 stack.setItemMeta(pmeta);
-                Potion potion = Potion.fromItemStack(stack);
-                potion.setSplash(isSplashPotion);
-                potion.apply(stack);
+                if (ReflUtil.getNmsVersionObject().isHigherThanOrEqualTo(ReflUtil.V1_9_R1)) {
+                    if (isSplashPotion && stack.getType() != Material.SPLASH_POTION) {
+                        stack.setType(Material.SPLASH_POTION);
+                    } else if (!isSplashPotion && stack.getType() != Material.POTION) {
+                        stack.setType(Material.POTION);
+                    }
+                } else {
+                    Potion potion = Potion.fromItemStack(stack);
+                    potion.setSplash(isSplashPotion);
+                    potion.apply(stack);
+                }
                 resetPotionMeta();
             }
         }
